@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	</head>
+
+	<body>
+
+		<canvas id="myCanvas" height="1000px" width="600px" style="border:1px solid #d3d3d3;">
+			Your browser does not support the HTML5 canvas tag.
+		</canvas>
+		<div>
+			<p>Display Area:</p>
+			<div id="displayarea"></div>
+		</div>
+		<script src="http://cdn.bootcss.com/jquery/2.2.0/jquery.min.js"></script>
+		<script src="../../../resources/js/jSignature.js"></script>
+		<script>
+			function upload(basestr) {
+				var xhr = new XMLHttpRequest();
+				xhr.open('post', 'http://192.168.1.105:8888/index.php/test/Signature/saveHT');
+				xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded;charset=utf-8');
+				xhr.setRequestHeader('X_Requested-With', 'XMLHttpRequest');
+				xhr.onreadystatechange = function() {
+					if (xhr.readyState == 4 && xhr.status == 200) {
+						var jsonData = JSON.parse(xhr.responseText);
+						console.log('上传成功：' + jsonData.path);
+					}
+				};
+				xhr.send('dataurl=' + encodeURIComponent(basestr));
+			}
+
+			function mergeImage() {
+				var c = document.getElementById("myCanvas");
+				var ctx = c.getContext("2d");
+				var img = new Image(); //创建image
+				img.src = 'http://192.168.1.105:8888/qrcode/ht.jpg'; //添加图片路径
+				ctx.drawImage(img, 0, 0, 600, 1000); //绘画
+				ctx.globalCompositeOperation = "source-over";
+				
+				var img2 = new Image(); //创建image
+				img2.src = 'http://192.168.1.105:8888/qrcode/sign.png'; //添加图片路径
+				ctx.drawImage(img2, 300, 900, 200, 100); //绘画
+				var dataurl = c.toDataURL('image/png');
+				var i = new Image()
+				i.src = dataurl;
+				$(i).appendTo($('#displayarea'));
+//				alert(dataurl); //data:image/png;base64,
+				upload(dataurl.split(',')[1]);
+			}
+			
+			   	mergeImage();
+			
+		</script>
+
+	</body>
+
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+		<title>image demo</title>
+		<link href="http://cdn.bootcss.com/extjs/6.0.0/classic/theme-triton/resources/theme-triton-all.css" rel="stylesheet">
+		<script src="http://cdn.bootcss.com/extjs/6.0.0/ext-all.js"></script>
+		<script src="http://cdn.bootcss.com/extjs/6.0.0/classic/locale/locale-zh_CN.js"></script>
+		<script src="http://cdn.bootcss.com/extjs/6.0.0/classic/theme-triton/theme-triton.js"></script>
+		<style>
+			body,
+			html {
+				height: 100%;
+			}
+		</style>
+		<script type="text/javascript">
+			var base_path = "<?php echo $base;?>";
+
+			function downloadFile(fileName, content) {
+				var aLink = document.createElement('a');
+				var blob = new Blob(['"'+content+'"']);
+				var evt = document.createEvent("HTMLEvents");
+				evt.initEvent("click", false, false); //initEvent 不加后两个参数在FF下会报错, 感谢 Barret Lee 的反馈
+				aLink.download = fileName;
+				aLink.href = URL.createObjectURL(blob);
+				aLink.dispatchEvent(evt);
+			}
+			
+			Ext.onReady(function() {
+				Ext.create('Ext.form.Panel', {
+					renderTo: 'imgs',
+					width: '100%',
+					bodyPadding: 10,
+					title: '图片上传 demo',
+					items: [{
+						xtype: 'filefield',
+						name: 'poster',
+						fieldLabel: '海报',
+						labelWidth: 80,
+						msgTarget: 'side',
+						allowBlank: false,
+						anchor: '100%',
+						regex: /\.(gif|jpg|jpeg|png|GIF|JPG|PNG)$/,
+						regexText: '请选择有效格式的文件!',
+						buttonText: '请选择图片...'
+					}],
+					buttons: [{
+						text: '上传图片',
+						handler: function() {
+							var form = this.up('form').getForm();
+							if (form.isValid()) {
+								form.submit({
+									url: base_path + 'index.php/demo/FileDemo/uploadImage',
+									waitMsg: '图片正在上传...',
+									success: function(form, action) {
+										Ext.Msg.alert('提示', '上传成功!');
+										document.getElementById('imageshow').innerHTML = '<a href="' + base_path + action.result.msg + '" download="我是海报啊"><img style="width:150px;height:150px" src="' + base_path + action.result.msg + '"/></a>';
+									},
+									failure: function(form, action) {
+										Ext.Msg.alert("提示", "上传失败！");
+									}
+								});
+							}
+						}
+					}, {
+						text: '下载图片',
+						handler: function() {
+							Ext.Ajax.request({
+								method: "get",
+								params: {
+									file_path: 'img_poster/1453946146.png'
+								},
+								url: base_path + 'index.php/demo/FileDemo/downloadImage',
+								success: function(response, opts) {
+									//									 window.location.href = '/img_poster/1453946146.png';
+									downloadFile('haha.png', response.content);
+									//									var obj = Ext.decode(response.responseText);
+									//									console.dir(obj);
+								},
+								failure: function(response, opts) {
+									console.log('server-side failure with status code ' + response.status);
+								}
+							});
+						}
+					}]
+				});
+			});
+		</script>
+	</head>
+
+	<body>
+		<div id="imgs"></div>
+		<div id="imageshow">你大爷的</div>
+	</body>
+
+</html>

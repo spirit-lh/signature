@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	</head>
+
+	<body>
+		<div id="signature"></div>
+	    <input id="toim" type="button" onclick="kkk();" value="生成" />
+	    <div><p>Display Area:</p><div id="displayarea"></div></div>
+		<script src="http://cdn.bootcss.com/jquery/2.2.0/jquery.min.js"></script>
+		<script src="../../../resources/js/jSignature.js"></script>
+		<script>
+		var $sigdiv = $("#signature").jSignature();
+		
+		function kkk(){
+			$extraarea = $('#displayarea');
+				var datapair = $sigdiv.jSignature("getData","image") ;
+				var i = new Image()
+		i.src = 'data:' + datapair[0] + ',' + datapair[1];
+		$(i).appendTo($extraarea);
+			 upload(datapair[1],'image/png');
+			}
+		
+    function upload(basestr) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('post','http://192.168.1.105:8888/index.php/test/Signature/saveImgBase64');
+        xhr.setRequestHeader('Content-Type','application/x-www-form-urlencoded;charset=utf-8');
+        xhr.setRequestHeader('X_Requested-With','XMLHttpRequest');
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState == 4 && xhr.status == 200) {
+                var jsonData = JSON.parse(xhr.responseText);
+                console.log('上传成功：' + jsonData.path);
+            }
+        };
+        xhr.send('dataurl='+encodeURIComponent(basestr));
+    }
+    
+    
+    
+    
+		</script>
+	</body>
+
+</html>
