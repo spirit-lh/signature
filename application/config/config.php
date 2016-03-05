@@ -17,7 +17,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 | environments.
 |
 */
-$config['base_url'] = 'http://192.168.1.105:8888/';
+$config['base_url'] = 'http://127.0.0.1:8888/';
 
 /*
 |--------------------------------------------------------------------------
